@@ -1,12 +1,12 @@
-import { Component, OnInit, TemplateRef } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { BsModalService } from 'ngx-bootstrap/modal';
 import { Evento } from '../_models/Evento';
 import { EventoService } from '../_services/evento.service';
 import { BsLocaleService} from 'ngx-bootstrap/datepicker';
 import { ptBrLocale } from 'ngx-bootstrap/locale';
-import { defineLocale} from 'ngx-bootstrap/chronos';
-import { templateJitUrl } from '@angular/compiler';
+import { defineLocale } from 'ngx-bootstrap/chronos';
+import { ToastrService } from 'ngx-toastr';
 defineLocale('pt-br', ptBrLocale);
 
 @Component({
@@ -26,22 +26,23 @@ export class EventosComponent implements OnInit {
   modoSalvar = 'post';
   bodyDeletarEvento = '';
 
-  private _filtroLista: string;
+  private listaFiltro: string;
 
   constructor(
     private eventoService: EventoService,
     private modalService: BsModalService,
     private fb: FormBuilder,
-    private localeService: BsLocaleService
+    private localeService: BsLocaleService,
+    private toastr: ToastrService
     ) {
       this.localeService.use('pt-br');
     }
 
   public get filtroLista(): string {
-    return this._filtroLista;
+    return this.listaFiltro;
   }
   public set filtroLista(value: string) {
-    this._filtroLista = value;
+    this.listaFiltro = value;
     this.eventosFiltrados = this.filtroLista ? this.filtrarEventos(this.filtroLista) : this.eventos;
   }
 
@@ -50,7 +51,6 @@ export class EventosComponent implements OnInit {
     this.openModal(template);
     this.evento = evento;
     this.registerForm.patchValue(evento);
-
   }
 
   novoEvento(template: any): void{
@@ -65,13 +65,13 @@ export class EventosComponent implements OnInit {
   }
 
   confirmeDelete(template: any): void{
-    //console.log(this.evento.id);
     this.eventoService.deleteEvento(this.evento.id).subscribe(
       () => {
           template.hide();
           this.getEventos();
+          this.toastr.success('Deletado com Sucesso!');
         }, error => {
-          console.log(error);
+          this.toastr.error(`Erro ao tentar Deletar: ${error}`);
         }
     );
   }
@@ -118,8 +118,9 @@ export class EventosComponent implements OnInit {
         (novoEvento: Evento) => {
           template.hide();
           this.getEventos();
+          this.toastr.success('Inserido com Sucesso!');
         }, error => {
-          console.log(error);
+          this.toastr.error(`Erro ao tentar Inserir: ${error}`);
         }
       );
       }
@@ -129,8 +130,9 @@ export class EventosComponent implements OnInit {
         () => {
           template.hide();
           this.getEventos();
+          this.toastr.success('Editado com Sucesso!');
         }, error => {
-          console.log(error);
+          this.toastr.error(`Erro ao tentar Editar: ${error}`);
         }
       );
       }
@@ -139,12 +141,12 @@ export class EventosComponent implements OnInit {
 
   getEventos(): void{
     this.eventoService.getAllEvento().subscribe(
-      (_eventos: Evento[]) => {
-        this.eventos = _eventos;
+      (eventoss: Evento[]) => {
+        this.eventos = eventoss;
         this.eventosFiltrados = this.eventos;
       },
       error => {
-        console.log(error);
+        this.toastr.error(`Erro ao tentar Listar: ${error}`);
       }
     );
   }
