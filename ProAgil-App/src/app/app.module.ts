@@ -29,6 +29,9 @@ import { TituloComponent } from './_shared/titulo/titulo.component';
 
 // Pipes
 import { DateTimeFormatPipePipe } from './_helps/DateTimeFormatPipe.pipe';
+import { UserComponent } from './user/user.component';
+import { LoginComponent } from './user/login/login.component';
+import { RegistrationComponent } from './user/registration/registration.component';
 
 @NgModule({
   declarations: [
@@ -39,7 +42,10 @@ import { DateTimeFormatPipePipe } from './_helps/DateTimeFormatPipe.pipe';
     DashboardComponent,
     ContatosComponent,
     TituloComponent,
-    DateTimeFormatPipePipe
+    DateTimeFormatPipePipe,
+    UserComponent,
+    LoginComponent,
+    RegistrationComponent
    ],
   imports: [
     BrowserModule,
